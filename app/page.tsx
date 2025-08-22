@@ -1,38 +1,85 @@
 'use client'
 
 import { useEffect, useState } from "react";
-
-// import { LineChart, Line, CartesianGrid, XAxis, YAxis, Legend } from 'recharts';
+import { Line } from "react-chartjs-2";
+import "chart.js/auto";
 
 export default function Home() {
-  const [subscribers, setSubscribers] = useState(null);
+  const [subscribers, setSubscribers] = useState<number | null>(null);
+  const [data, setData] = useState<number[]>([]);
+  const [labels, setLabels] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${process.env.NEXT_PUBLIC_CHANNEL_ID}&key=${process.env.NEXT_PUBLIC_API_KEY}`)
-  .then(res => res.json())
-  .then(data => setSubscribers(data.items[0].statistics.subscriberCount))
+    const fetchSubscribers = async () => {
+      const res = await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${process.env.NEXT_PUBLIC_CHANNEL_ID}&key=${process.env.NEXT_PUBLIC_API_KEY}`
+      );
+      const result = await res.json();
+      const count = Number(result.items[0].statistics.subscriberCount);
 
-  }, [subscribers])
+      setSubscribers(count);
 
-const d = [{name: 'Page A', uv: 0, pv: 2400, amt: 2400}, {name: 'Page B', uv: subscribers, pv: 2400, amt: 2400}];
+      const today = new Date();
+      const dayName = today.toLocaleDateString("en-US", { weekday: "long" }); // Monday, Tuesday...
+
+      setLabels((prev) => {
+        // Eğer bugün zaten kaydedildiyse tekrar ekleme
+        if (prev.includes(dayName)) return prev;
+
+        // Eğer pazartesi ise (hafta başı) resetle
+        if (today.getDay() === 1) {
+          return [dayName];
+        }
+
+        // Maksimum 7 gün sakla
+        if (prev.length >= 7) {
+          return [...prev.slice(1), dayName];
+        }
+
+        return [...prev, dayName];
+      });
+
+      setData((prev) => {
+        if (labels.includes(dayName)) return prev;
+
+        if (today.getDay() === 1) {
+          return [count];
+        }
+
+        if (prev.length >= 7) {
+          return [...prev.slice(1), count];
+        }
+
+        return [...prev, count];
+      });
+    };
+
+    fetchSubscribers(); // ilk çalıştır
+  }, [labels]); // labels değiştikçe yeniden çalışır
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: "Subscribers (7-day)",
+        data,
+        borderColor: "rgba(75,192,192,1)",
+        backgroundColor: "rgba(75,192,192,0.2)",
+        tension: 0.3,
+        fill: true,
+      },
+    ],
+  };
 
   return (
-   <>
+    <>
+      <h1 className="text-4xl text-center mt-12">
+        Subscribers: {subscribers !== null ? subscribers : "Loading..."}
+      </h1>
 
-   <h1 className="text-4xl text-center mt-12">Subscribers: {subscribers !== null ? subscribers : "Loading..."}</h1>
-
-    <div className="">
-         {/* <LineChart width={600} height={300} data={d}>
-    <CartesianGrid />
-    <Line dataKey="uv" />
-    <XAxis dataKey="name" />
-    <YAxis />
-    <Legend />
-  </LineChart> */}
-    </div>
-
-
-
-   </>
+      <div className="flex justify-center mt-8 w-[700px] mx-auto bg-white">
+        <Line data={chartData} />
+      </div>
+    </>
   );
 }
