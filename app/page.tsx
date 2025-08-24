@@ -20,18 +20,18 @@ export default function Home() {
       setSubscribers(count);
 
       const today = new Date();
-      const dayName = today.toLocaleDateString("en-US", { weekday: "long" }); // Monday, Tuesday...
+      const dayName = today.toLocaleDateString("en-US", { weekday: "long" }); 
 
       setLabels((prev) => {
-        // Eğer bugün zaten kaydedildiyse tekrar ekleme
+      
         if (prev.includes(dayName)) return prev;
 
-        // Eğer pazartesi ise (hafta başı) resetle
+   
         if (today.getDay() === 1) {
           return [dayName];
         }
 
-        // Maksimum 7 gün sakla
+       
         if (prev.length >= 7) {
           return [...prev.slice(1), dayName];
         }
@@ -54,8 +54,8 @@ export default function Home() {
       });
     };
 
-    fetchSubscribers(); // ilk çalıştır
-  }, [labels]); // labels değiştikçe yeniden çalışır
+    fetchSubscribers(); 
+  }, [labels]); 
 
   const chartData = {
     labels,
