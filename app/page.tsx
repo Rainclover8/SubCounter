@@ -83,3 +83,5 @@ export default function Home() {
     </>
   );
 }
+
+// 📌 Footer’daki Copyright Nedir, Neden Kullanılır
