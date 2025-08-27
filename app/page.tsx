@@ -87,3 +87,5 @@ export default function Home() {
 // 📌 Footer’daki Copyright Nedir, Neden Kullanılır
 
 // Chat gpt ile yazdık youtube shorts video olarak at!
+
+// Bu proje devamında - üni içerikleri ve 
