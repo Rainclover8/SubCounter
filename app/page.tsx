@@ -88,4 +88,4 @@ export default function Home() {
 
 // Chat gpt ile yazdık youtube shorts video olarak at!
 
-// Bu proje devamında - üni içerikleri ve 
+// Bu proje devamında - üni içerikleri ve çeşitli projeler devam edecek...
